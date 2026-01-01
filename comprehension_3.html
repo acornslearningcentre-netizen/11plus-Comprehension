@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Comprehension Assessment</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+min-height: 100vh;
+padding: 20px;
+}
+
+.container {
+max-width: 1400px;
+margin: 0 auto;
+background: white;
+border-radius: 15px;
+box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+overflow: hidden;
+}
+
+.header {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+padding: 30px;
+text-align: center;
+}
+
+.header h1 {
+font-size: 2em;
+margin-bottom: 10px;
+}
+
+.header p {
+font-size: 1.1em;
+opacity: 0.9;
+}
+
+.text-selector {
+display: flex;
+justify-content: center;
+gap: 20px;
+padding: 20px;
+background: #f8f9fa;
+border-bottom: 2px solid #dee2e6;
+}
+
+.text-btn {
+padding: 12px 30px;
+border: 2px solid #667eea;
+background: white;
+color: #667eea;
+font-size: 1.1em;
+font-weight: 600;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.text-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.text-btn.active {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+border-color: #667eea;
+}
+
+.main-content {
+display: flex;
+height: 600px;
+}
+
+.text-panel {
+flex: 1;
+padding: 30px;
+overflow-y: auto;
+border-right: 3px solid #e9ecef;
+background: #f8f9fa;
+}
+
+.text-panel::-webkit-scrollbar {
+width: 10px;
+}
+
+.text-panel::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+.text-panel::-webkit-scrollbar-thumb {
+background: #667eea;
+border-radius: 5px;
+}
+
+.text-panel::-webkit-scrollbar-thumb:hover {
+background: #764ba2;
+}
+
+.text-title {
+font-size: 1.8em;
+color: #667eea;
+margin-bottom: 20px;
+font-weight: bold;
+}
+
+.passage {
+line-height: 1.8;
+color: #333;
+padding: 20px;
+background: white;
+border-radius: 8px;
+font-size: 1.05em;
+border-left: 5px solid #667eea;
+}
+
+.question-panel {
+flex: 1;
+padding: 30px;
+overflow-y: auto;
+background: white;
+}
+
+.question-panel::-webkit-scrollbar {
+width: 10px;
+}
+
+.question-panel::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+.question-panel::-webkit-scrollbar-thumb {
+background: #667eea;
+border-radius: 5px;
+}
+
+.question-panel::-webkit-scrollbar-thumb:hover {
+background: #764ba2;
+}
+
+.question {
+margin-bottom: 30px;
+padding: 20px;
+background: #f8f9fa;
+border-radius: 8px;
+border: 2px solid #e9ecef;
+transition: all 0.3s ease;
+}
+
+.question.correct {
+border-color: #28a745;
+background: #f0fff4;
+}
+
+.question.incorrect {
+border-color: #dc3545;
+background: #fff5f5;
+}
+
+.question-text {
+font-weight: 600;
+color: #2c3e50;
+margin-bottom: 15px;
+font-size: 1.1em;
+}
+
+.options {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.option {
+padding: 12px 15px;
+background: white;
+border: 2px solid #dee2e6;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.option:hover {
+background: #e9ecef;
+transform: translateX(5px);
+}
+
+.option input[type="radio"] {
+cursor: pointer;
+width: 20px;
+height: 20px;
+}
+
+.option.selected {
+background: #667eea;
+color: white;
+border-color: #667eea;
+}
+
+.option.correct-answer {
+background: #28a745;
+color: white;
+border-color: #28a745;
+}
+
+.option.wrong-answer {
+background: #dc3545;
+color: white;
+border-color: #dc3545;
+}
+
+.feedback {
+margin-top: 15px;
+padding: 15px;
+border-radius: 6px;
+font-weight: 500;
+display: none;
+}
+
+.feedback.correct {
+background: #d4edda;
+color: #155724;
+border: 1px solid #c3e6cb;
+display: block;
+}
+
+.feedback.incorrect {
+background: #f8d7da;
+color: #721c24;
+border: 1px solid #f5c6cb;
+display: block;
+}
+
+.explanation {
+margin-top: 10px;
+padding: 12px;
+background: rgba(255, 255, 255, 0.5);
+border-radius: 5px;
+font-size: 0.95em;
+line-height: 1.6;
+border-left: 3px solid #667eea;
+}
+
+.feedback.correct .explanation {
+border-left-color: #28a745;
+}
+
+.feedback.incorrect .explanation {
+border-left-color: #dc3545;
+}
+
+.text-section {
+display: none;
+}
+
+.text-section.active {
+display: block;
+}
+
+.submit-section {
+padding: 30px;
+text-align: center;
+background: #f8f9fa;
+border-top: 2px solid #dee2e6;
+}
+
+.submit-btn {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+border: none;
+padding: 15px 40px;
+font-size: 1.1em;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.submit-btn:disabled {
+background: #6c757d;
+cursor: not-allowed;
+transform: none;
+}
+
+.progress-indicator {
+margin-bottom: 15px;
+font-size: 1.1em;
+color: #667eea;
+font-weight: 600;
+}
+
+.results {
+display: none;
+text-align: center;
+padding: 30px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+border-radius: 10px;
+margin: 30px;
+}
+
+.results.show {
+display: block;
+}
+
+.results h2 {
+font-size: 2em;
+margin-bottom: 20px;
+}
+
+.score {
+font-size: 3em;
+font-weight: bold;
+margin: 20px 0;
+}
+
+.progress-bar {
+width: 100%;
+height: 30px;
+background: rgba(255,255,255,0.3);
+border-radius: 15px;
+overflow: hidden;
+margin: 20px 0;
+}
+
+.progress-fill {
+height: 100%;
+background: white;
+transition: width 1s ease;
+border-radius: 15px;
+}
+
+@media (max-width: 1024px) {
+.main-content {
+flex-direction: column;
+height: auto;
+}
+
+.text-panel {
+border-right: none;
+border-bottom: 3px solid #e9ecef;
+max-height: 400px;
+}
+
+.question-panel {
+max-height: 600px;
+}
+}
+
+@media (max-width: 768px) {
+.container {
+margin: 10px;
+}
+
+.header h1 {
+font-size: 1.5em;
+}
+
+.text-selector {
+flex-direction: column;
+gap: 10px;
+}
+
+.main-content {
+height: auto;
+}
+
+.text-panel, .question-panel {
+padding: 15px;
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>📖 Reading Comprehension Assessment</h1>
+<p>Read the text on the left and answer questions on the right</p>
+</div>
+
+<div class="text-selector">
+<button class="text-btn active" onclick="showText(1)">Text 1: The Hedge Line</button>
+<button class="text-btn" onclick="showText(2)">Text 2: The Letter in the Register</button>
+</div>
+
+<div class="main-content">
+<!-- Text Panel -->
+<div class="text-panel">
+<!-- Text 1 -->
+<div class="text-section active" id="text1">
+<div class="text-title">Text 1: The Hedge Line</div>
+<div class="passage">
+Its beginning was as small as a snagged sleeve, yet it grew, as such things do, into a matter of principle. Bowen had only meant to trim the laurel, to let in a little more light; but when his shears clicked and a spray toppled into Mr Harrow's garden, Harrow came out as if summoned, wiping his hands on a cloth that was already clean. "That's over the line," he said, and pointed—not at the leaves, but at something invisible between the paving stones.<br><br>
+
+<strong>5</strong> Bowen, who disliked quarrels the way he disliked drafts, smiled with a careful politeness. "Just the top," he replied. "It leans. It's shading the beans." Harrow's mouth tightened, as though the word beans were an accusation. He was a man who measured things: fence posts, receipts, other people's tone.<br><br>
+
+Then, absurdly, a blackbird fell—thudded into the border with a sound too soft for the fuss it caused. The bird lay on its side, one wing spread like a torn glove. Bowen stepped forward, meaning to lift it,<br>
+<strong>10</strong> but Harrow reached first, not gently, but quickly, as if the bird were evidence.<br><br>
+
+"Cats," Harrow said, holding it at arm's length. "That's what you get when people feed strays." His eyes flicked to Bowen's bowl by the shed, the one he kept "for hedgehogs," though no hedgehog had ever been caught in the act.<br><br>
+
+Bowen felt a hot rise of indignation—unreasonable, and therefore difficult to control. It was not the bird, precisely, but the ease with which Harrow made blame a hobby. Bowen said, "It might have flown into the window," and heard how weak it sounded.<br>
+<strong>15</strong> Harrow's laughter was brief and dry. "Windows don't stalk."<br><br>
+
+Bowen could have answered sharply, and almost did. Instead he watched Harrow crouch and set the bird on a patch of soil, arranging it with a tenderness he had not shown in his voice. That, more than the earlier remark, unsettled Bowen: the notion that a person could be careful with a creature and careless with a man.<br><br>
+
+When Harrow stood, he wiped his hands again, slower this time. "We'll have to speak about the hedge," he said, as if returning to an agenda. "It's been creeping."<br><br>
+
+Bowen looked at the laurel. In the wind it shivered, innocent as any green thing, and yet he could feel the old neighbourhood turning—quietly—into sides.
+</div>
+</div>
+
+<!-- Text 2 -->
+<div class="text-section" id="text2">
+<div class="text-title">Text 2: The Letter in the Register</div>
+<div class="passage">
+It was the sort of morning that made the corridor feel longer: rain worrying the windows, shoes squeaking, voices sharpened by damp. In Form 6, Mr Pell had placed the register on the desk as though it were a warning, and he was writing the date with a deliberation that suggested it mattered more than usual. Tobi noticed this because Mr Pell was ordinarily swift—an efficient man, like a stapler.<br><br>
+
+<strong>5</strong> "Before we begin," Mr Pell said, "I've been asked to deliver something." He reached into the drawer and produced an envelope without a stamp, creamy and thick, the kind that looked expensive even when it was empty. The class leaned in without meaning to. Curiosity, in a classroom, moved like a draft.<br><br>
+
+Mr Pell read the name on the front, then paused—long enough for everyone to imagine the worst. "Amina Rahman." The envelope remained in his hand as if it had weight.<br><br>
+
+Amina, who usually sat upright as though balance were a rule, went still. She did not smile; she did not frown. She simply rose and walked to the desk with the careful steps of someone who had learned to avoid attention by moving as if she deserved it.<br>
+<strong>10</strong> Mr Pell handed it over. "Take it outside if you wish," he said, too politely.<br><br>
+
+When Amina sat, she did not open it. Instead she ran her thumb along the seal, once, twice, as if checking whether it might bite. Tobi felt an irritation he could not justify. It was not jealousy—he told himself—but the strange unfairness of secrecy.<br><br>
+
+A pencil dropped somewhere. Mr Pell began the lesson, speaking about inference, of all things, but the words skimmed the room rather than landing. Everyone watched Amina out of the corner of their eyes. Even the quiet children seemed louder in their silence.<br><br>
+
+At last Amina slipped the envelope into her bag, unopened. Tobi's irritation shifted into suspicion: who kept news to themselves when it was clearly important? Unless—he thought—opening it here would change something. The class, the day, perhaps even Amina.<br><br>
+
+<strong>15</strong> When the bell went, chairs scraped and the corridor swallowed them. Amina was the first to leave. As she passed, the envelope fell—a soft drop, like a sigh—onto the floor. Tobi saw that the back flap had a school crest stamped in dark blue, but beneath it, in small print, were words he could not fully read: Foundation… Award…<br><br>
+
+He should have called out. Instead he stooped, picked it up, and for a moment held in his hand the sort of thing that made futures tilt. Then he ran after her, the envelope suddenly warm, as if it had been waiting.
+</div>
+</div>
+</div>
+
+<!-- Question Panel -->
+<div class="question-panel">
+<div id="text1-questions" class="question-section active"></div>
+<div id="text2-questions" class="question-section" style="display: none;"></div>
+</div>
+</div>
+
+<div class="submit-section">
+<div class="progress-indicator" id="progressIndicator">Questions answered: 0/20</div>
+<button class="submit-btn" id="submitBtn">Submit All Answers</button>
+</div>
+
+<div class="results" id="results">
+<h2>🎉 Assessment Complete!</h2>
+<div class="score" id="scoreDisplay">0/20</div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<p id="feedback-message"></p>
+</div>
+</div>
+
+<script>
+const text1Questions = [
+{
+question: 'In line 1, "a snagged sleeve" suggests the dispute began as something that was…',
+options: ['dangerous', 'trivial', 'planned', 'public'],
+correct: 1,
+explanation: '"A snagged sleeve" is a tiny, everyday irritation, showing the argument started from something small.'
+},
+{
+question: 'Harrow pointing at "something invisible" (line 4) implies he is most concerned with…',
+options: ['beauty', 'law and boundaries', 'wildlife', 'gardening tips'],
+correct: 1,
+explanation: 'The "invisible" thing is the boundary line: rules and territory matter more to Harrow than the leaves.'
+},
+{
+question: 'The phrase "measured things" (line 8) mainly shows Harrow is…',
+options: ['imaginative', 'careless', 'exacting', 'easily frightened'],
+correct: 2,
+explanation: 'He "measures" not just objects but people\'s tone, showing he\'s strict, precise, and judging.'
+},
+{
+question: 'Why does the blackbird\'s fall feel "absurd" (line 9)?',
+options: ['It proves Bowen is lying', 'It interrupts the argument with something unexpected', 'It is clearly pretending to be injured', 'It makes Harrow suddenly friendly'],
+correct: 1,
+explanation: 'A sudden injured bird appears in the middle of a hedge dispute, making the conflict feel oddly heightened.'
+},
+{
+question: 'When Harrow holds the bird "as if the bird were evidence" (line 10), this suggests he…',
+options: ['wants to solve a mystery fairly', 'is looking for someone to blame', 'is afraid of birds', 'plans to take it to a vet'],
+correct: 1,
+explanation: 'Treating the bird as "evidence" suggests he wants to pin responsibility on Bowen (via cats/strays).'
+},
+{
+question: 'In context, "indignation" (line 13) most nearly means…',
+options: ['embarrassment', 'righteous anger', 'confusion', 'relief'],
+correct: 1,
+explanation: 'Bowen feels offended at being unfairly blamed; that\'s indignation.'
+},
+{
+question: 'Bowen notices his own explanation sounds "weak" (line 14) because…',
+options: ['he knows he is guilty', 'he doubts himself and feels outmatched', 'he cannot hear properly', 'he wants to end the conversation quickly'],
+correct: 1,
+explanation: 'His reasonable idea ("maybe a window") sounds weak because Harrow\'s certainty dominates the moment.'
+},
+{
+question: 'Harrow\'s line "Windows don\'t stalk" (line 15) is an example of…',
+options: ['understatement', 'metaphor', 'sarcasm', 'a factual warning'],
+correct: 2,
+explanation: '"Windows don\'t stalk" mocks Bowen\'s suggestion and dismisses it with a cutting, sneering tone.'
+},
+{
+question: 'Bowen is most "unsettled" (line 18) because Harrow shows…',
+options: ['kindness to the bird but not to Bowen', 'fear of animals', 'that the bird is dead', 'that the hedge is dangerous'],
+correct: 0,
+explanation: 'The contrast unsettles Bowen: Harrow shows tenderness to an animal but not to a person.'
+},
+{
+question: 'The final sentence suggests the neighbourhood is becoming…',
+options: ['more festive', 'divided and tense', 'quieter and safer', 'full of new families'],
+correct: 1,
+explanation: '"Turning—quietly—into sides" implies people are choosing camps and the atmosphere is splitting.'
+}
+];
+
+const text2Questions = [
+{
+question: 'The corridor feels longer (line 1) mainly because of…',
+options: ['excitement about a trip', 'the gloomy weather and tense mood', 'a fire drill', 'loud music'],
+correct: 1,
+explanation: 'Rain, squeaking shoes, and sharpened voices create heaviness; time feels stretched.'
+},
+{
+question: '"like a stapler" (line 4) suggests Mr Pell is…',
+options: ['dull but useful and precise', 'loud and unpredictable', 'humorous and relaxed', 'nervous and forgetful'],
+correct: 0,
+explanation: '"Like a stapler" suggests efficient, practical, no-nonsense: not warm, just effective.'
+},
+{
+question: 'The envelope "without a stamp" (line 6) implies it was…',
+options: ['delivered secretly by a student', 'brought from within the school', 'posted from another country', 'found on the street'],
+correct: 1,
+explanation: 'No stamp implies it wasn\'t posted; it\'s internal delivery (and it\'s in the teacher\'s drawer).'
+},
+{
+question: '"Curiosity… moved like a draft" (line 7) is used to show curiosity is…',
+options: ['harmless but uncontrollable', 'noisy and joyful', 'expensive', 'dangerous to health'],
+correct: 0,
+explanation: 'A draft slips through quietly and spreads; curiosity moves the same way across the class.'
+},
+{
+question: 'Mr Pell pauses (line 8) most likely to…',
+options: ['embarrass Amina on purpose', 'build suspense unintentionally or deliberately', 'check if he read the name correctly', 'decide to keep the letter'],
+correct: 1,
+explanation: 'The pause is long enough for everyone to imagine the worst, so it heightens tension.'
+},
+{
+question: 'Amina\'s "careful steps" (line 9) suggest she is…',
+options: ['pretending to be ill', 'used to managing how others see her', 'angry with the teacher', 'unaware of attention'],
+correct: 1,
+explanation: 'She\'s learned to avoid attention by moving in a controlled, "deserving" way.'
+},
+{
+question: 'In context, "the strange unfairness of secrecy" (line 12) means Tobi feels…',
+options: ['he deserves to know what the letter says', 'secrecy is always wrong', 'letters should be read at home', 'Amina is definitely lying'],
+correct: 0,
+explanation: 'Tobi\'s irritation comes from feeling excluded; secrecy feels unfair to him.'
+},
+{
+question: 'The lesson words "skimmed… rather than landing" (line 13) implies…',
+options: ['Mr Pell is speaking too quietly', 'the class is distracted and not absorbing it', 'the lesson is too easy', 'the class is taking notes quickly'],
+correct: 1,
+explanation: 'The words "skim" because attention is on Amina and the envelope, not the lesson.'
+},
+{
+question: 'Why might Amina keep the envelope unopened (lines 11–14)?',
+options: ['She cannot read', 'She wants to protect herself from a public reaction', 'She has forgotten what envelopes are for', 'She is waiting for Mr Pell to open it'],
+correct: 1,
+explanation: 'Keeping it sealed helps her control the moment and avoid visible emotion or gossip.'
+},
+{
+question: 'The final lines suggest Tobi\'s choice to return the letter is driven mostly by…',
+options: ['a desire to gossip', 'guilt and a growing sense of responsibility', 'fear of punishment', 'boredom'],
+correct: 1,
+explanation: '"He should have called out" signals guilt; returning it shows a better impulse than gossip.'
+}
+];
+
+let answeredCount = 0;
+
+function renderQuestions(questions, containerId, startNumber) {
+const container = document.getElementById(containerId);
+questions.forEach((q, index) => {
+const questionNum = startNumber + index;
+const questionDiv = document.createElement('div');
+questionDiv.className = 'question';
+questionDiv.id = `question-${questionNum}`;
+
+questionDiv.innerHTML = `
+<div class="question-text">${questionNum}. ${q.question}</div>
+<div class="options">
+${q.options.map((option, optIndex) => `
+<label class="option" data-question="${questionNum}" data-option="${optIndex}">
+<input type="radio" name="q${questionNum}" value="${optIndex}">
+<span>${String.fromCharCode(65 + optIndex)}. ${option}</span>
+</label>
+`).join('')}
+</div>
+<div class="feedback" id="feedback-${questionNum}"></div>
+`;
+
+container.appendChild(questionDiv);
+});
+}
+
+function updateProgress() {
+answeredCount = 0;
+for (let i = 1; i <= 20; i++) {
+if (document.querySelector(`input[name="q${i}"]:checked`)) {
+answeredCount++;
+}
+}
+document.getElementById('progressIndicator').textContent = `Questions answered: ${answeredCount}/20`;
+}
+
+function showText(textNum) {
+// Update text display
+document.querySelectorAll('.text-section').forEach(section => {
+section.classList.remove('active');
+});
+document.getElementById(`text${textNum}`).classList.add('active');
+
+// Update question display
+document.querySelectorAll('.question-section').forEach(section => {
+section.style.display = 'none';
+});
+document.getElementById(`text${textNum}-questions`).style.display = 'block';
+
+// Update button styles
+document.querySelectorAll('.text-btn').forEach((btn, index) => {
+btn.classList.remove('active');
+});
+event.target.classList.add('active');
+}
+
+renderQuestions(text1Questions, 'text1-questions', 1);
+renderQuestions(text2Questions, 'text2-questions', 11);
+
+document.querySelectorAll('.option').forEach(option => {
+option.addEventListener('click', function() {
+const questionNum = this.dataset.question;
+document.querySelectorAll(`[data-question="${questionNum}"]`).forEach(opt => {
+opt.classList.remove('selected');
+});
+this.classList.add('selected');
+this.querySelector('input').checked = true;
+updateProgress();
+});
+});
+
+document.getElementById('submitBtn').addEventListener('click', function() {
+const allQuestions = [...text1Questions, ...text2Questions];
+let correct = 0;
+let answered = 0;
+
+allQuestions.forEach((q, index) => {
+const questionNum = index + 1;
+const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
+const questionDiv = document.getElementById(`question-${questionNum}`);
+const feedback = document.getElementById(`feedback-${questionNum}`);
+
+if (selected) {
+answered++;
+const selectedValue = parseInt(selected.value);
+const isCorrect = selectedValue === q.correct;
+
+if (isCorrect) {
+correct++;
+questionDiv.classList.add('correct');
+questionDiv.classList.remove('incorrect');
+feedback.className = 'feedback correct';
+feedback.innerHTML = `
+<strong>✓ Correct!</strong>
+<div class="explanation"><strong>Why:</strong> ${q.explanation}</div>
+`;
+} else {
+questionDiv.classList.add('incorrect');
+questionDiv.classList.remove('correct');
+feedback.className = 'feedback incorrect';
+feedback.innerHTML = `
+<strong>✗ Incorrect.</strong> The correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.
+<div class="explanation"><strong>Why:</strong> ${q.explanation}</div>
+`;
+}
+
+document.querySelectorAll(`[data-question="${questionNum}"]`).forEach(opt => {
+const optIndex = parseInt(opt.dataset.option);
+if (optIndex === q.correct) {
+opt.classList.add('correct-answer');
+} else if (optIndex === selectedValue && !isCorrect) {
+opt.classList.add('wrong-answer');
+}
+});
+}
+});
+
+if (answered < 20) {
+alert('Please answer all questions before submitting.');
+return;
+}
+
+const percentage = (correct / 20) * 100;
+document.getElementById('scoreDisplay').textContent = `${correct}/20`;
+document.getElementById('progressFill').style.width = `${percentage}%`;
+
+let message = '';
+if (percentage >= 90) {
+message = 'Outstanding work! Excellent comprehension skills! 🌟';
+} else if (percentage >= 75) {
+message = 'Great job! You have strong reading comprehension. 👏';
+} else if (percentage >= 60) {
+message = 'Good effort! Keep practicing to improve further. 📚';
+} else {
+message = 'Keep trying! Review the texts and try again. 💪';
+}
+document.getElementById('feedback-message').textContent = message;
+
+document.getElementById('results').classList.add('show');
+this.disabled = true;
+this.textContent = 'Assessment Submitted';
+
+document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Initialize progress
+updateProgress();
+</script>
+</body>
+</html>
